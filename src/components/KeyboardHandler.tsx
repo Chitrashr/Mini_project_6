@@ -122,47 +122,142 @@ const KeyboardHandler: React.FC<KeyboardHandlerProps> = ({ children }) => {
 
   const params = useParams();
 
+  // useEffect(() => {
+  //   const handleKeyDown = (event: KeyboardEvent) => {
+  //     // Ignore keyboard shortcuts when user is typing in form fields or when modifier keys are pressed
+  //     if (
+  //       event.target instanceof HTMLInputElement ||
+  //       event.target instanceof HTMLTextAreaElement ||
+  //       event.altKey ||
+  //       event.ctrlKey ||
+  //       event.metaKey ||
+  //       event.shiftKey
+  //     ) {
+  //       return;
+  //     }
+      
+  //     const { key } = event;
+  //     console.log("Key Pressed:", event.key);
+  //     const pathMatch = currentPath.match(/^\/course\/([^/]+)/);
+  //     const courseId = pathMatch ? pathMatch[1] : undefined;
+
+  //     console.log("Current Path:", currentPath, "Course ID Param:", courseId);
+
+  //     // Global handling for the 'R' key to repeat last utterance
+  //     if (key === 'r' || key === 'R') {
+  //       repeatLastUtterance();
+  //       event.preventDefault(); // Prevent the default behavior of the keypress
+  //       event.stopPropagation(); // Stop event propagation
+  //       return;
+  //     }
+
+  //     // Only handle course-related key events in course viewer
+  //     if (currentPath.includes('/course/') && courseId) {
+  //       const course = getCourse(courseId);
+  //       console.log("CourseID:", courseId, "Fetched Course:", course);
+  //       if (!course) return;
+
+  //       const urlParams = new URLSearchParams(location.search);
+  //       const currentSlide = parseInt(urlParams.get('slide') || '1', 10);
+  //       const totalSlides = course.slides.length;
+
+  //       let handled = true;
+
+  //       switch (key) {
+  //         case 'ArrowRight':
+  //           if (currentSlide < totalSlides) {
+  //             navigate(`/course/${courseId}?slide=${currentSlide + 1}`);
+  //           } else {
+  //             navigate(`/quiz/${courseId}`);
+  //           }
+  //           break;
+
+  //         case 'ArrowLeft':
+  //           if (currentSlide > 1) {
+  //             navigate(`/course/${courseId}?slide=${currentSlide - 1}`);
+  //           }
+  //           break;
+
+  //         case '1':
+  //         case '2':
+  //         case '3':
+  //           const slideNum = parseInt(key, 10);
+  //           if (slideNum <= totalSlides) {
+  //             navigate(`/course/${courseId}?slide=${slideNum}`);
+  //           }
+  //           break;
+
+  //         default:
+  //           handled = false;
+  //           break;
+  //       }
+
+  //       if (handled) {
+  //         event.preventDefault();
+  //         event.stopPropagation();
+  //       }
+  //     }
+  //   };
+
+  //   // Add the event listener to the document to ensure it catches all keyboard events
+  //   window.addEventListener('keydown', handleKeyDown, true);
+
+  //   return () => {
+  //     window.removeEventListener('keydown', handleKeyDown, true);
+  //   };
+  // }, [location, navigate, params, getCourse, repeatLastUtterance]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Ignore keyboard shortcuts when user is typing in form fields or when modifier keys are pressed
+      // Ignore shortcuts when typing or with special keys (but NOT shift alone)
       if (
         event.target instanceof HTMLInputElement ||
         event.target instanceof HTMLTextAreaElement ||
         event.altKey ||
         event.ctrlKey ||
-        event.metaKey ||
-        event.shiftKey
+        event.metaKey
       ) {
         return;
       }
-
-      const { key } = event;
-      console.log("Key Pressed:", event.key);
-      const pathMatch = currentPath.match(/^\/course\/([^/]+)/);
-      const courseId = pathMatch ? pathMatch[1] : undefined;
-
-      console.log("Current Path:", currentPath, "Course ID Param:", courseId);
-      
-      // Global handling for the 'R' key to repeat last utterance
-      if (key === 'r' || key === 'R') {
-        repeatLastUtterance();
-        event.preventDefault(); // Prevent the default behavior of the keypress
-        event.stopPropagation(); // Stop event propagation
+  
+      // Handle Shift key to move focus between buttons or inputs
+      if (event.key === 'Shift') {
+        event.preventDefault();
+  
+        const focusableElements = Array.from(document.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )).filter(el => !el.hasAttribute('disabled') && el.offsetParent !== null);
+  
+        if (focusableElements.length === 0) return;//new
+        const index = focusableElements.indexOf(document.activeElement as HTMLElement);
+        const nextIndex = (index + 1) % focusableElements.length;
+        focusableElements[nextIndex].focus();
+  
         return;
       }
-
-      // Only handle course-related key events in course viewer
+  
+      const { key } = event;
+      console.log("Key Pressed:", key);
+      const pathMatch = currentPath.match(/^\/course\/([^/]+)/);
+      const courseId = pathMatch ? pathMatch[1] : undefined;
+  
+      if (key === 'r' || key === 'R') {
+        repeatLastUtterance();
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+  
       if (currentPath.includes('/course/') && courseId) {
         const course = getCourse(courseId);
-        console.log("CourseID:", courseId, "Fetched Course:", course);
         if (!course) return;
-
+  
         const urlParams = new URLSearchParams(location.search);
         const currentSlide = parseInt(urlParams.get('slide') || '1', 10);
         const totalSlides = course.slides.length;
-
+  
         let handled = true;
-
+  
         switch (key) {
           case 'ArrowRight':
             if (currentSlide < totalSlides) {
@@ -171,13 +266,13 @@ const KeyboardHandler: React.FC<KeyboardHandlerProps> = ({ children }) => {
               navigate(`/quiz/${courseId}`);
             }
             break;
-
+  
           case 'ArrowLeft':
             if (currentSlide > 1) {
               navigate(`/course/${courseId}?slide=${currentSlide - 1}`);
             }
             break;
-
+  
           case '1':
           case '2':
           case '3':
@@ -186,26 +281,23 @@ const KeyboardHandler: React.FC<KeyboardHandlerProps> = ({ children }) => {
               navigate(`/course/${courseId}?slide=${slideNum}`);
             }
             break;
-
+  
           default:
             handled = false;
             break;
         }
-
+  
         if (handled) {
           event.preventDefault();
           event.stopPropagation();
         }
       }
     };
-
-    // Add the event listener to the document to ensure it catches all keyboard events
+  
     window.addEventListener('keydown', handleKeyDown, true);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown, true);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
   }, [location, navigate, params, getCourse, repeatLastUtterance]);
+  
 
   return <>{children}</>;
 };
