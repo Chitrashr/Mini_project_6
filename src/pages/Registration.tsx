@@ -13,7 +13,8 @@ const Registration: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     age: '',
-    education: ''
+    education: '',
+    phone: ''
   });
 
   useEffect(() => {
@@ -83,6 +84,19 @@ const Registration: React.FC = () => {
             min={18}
             max={100}
             placeholder="Enter your age"
+          />
+
+          <FormField
+            id="phone"
+            label="Phone No."
+            type="string"
+            required
+            value={formData.phone}
+            onChange={handleChange}
+            onFocus={() => speak("Please enter your phone number.")}//new
+            min={18}
+            max={100}
+            placeholder="Enter your Phone No."
           />
 
           {/* <FormField
