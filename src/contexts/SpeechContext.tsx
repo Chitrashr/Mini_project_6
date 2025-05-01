@@ -6,6 +6,7 @@ interface SpeechContextType {
   isSpeaking: boolean;
   isSupported: boolean;
   repeatLastUtterance: () => void;
+  lastText: string;
 }
 
 const SpeechContext = createContext<SpeechContextType | undefined>(undefined);
@@ -75,7 +76,7 @@ export const SpeechProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   }, [lastText, lastRate, lastPitch, speak]);
 
   return (
-    <SpeechContext.Provider value={{ speak, stop, isSpeaking, isSupported, repeatLastUtterance }}>
+    <SpeechContext.Provider value={{ speak, stop, isSpeaking, isSupported, repeatLastUtterance ,lastText}}>
       {children}
     </SpeechContext.Provider>
   );
