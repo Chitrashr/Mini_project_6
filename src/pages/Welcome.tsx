@@ -19,6 +19,56 @@ const Welcome: React.FC = () => {
     // Automatically read welcome text when component mounts
     speak(welcomeText);
   }, [speak]);
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey
+      ) {
+        return;
+      }
+
+      const { key } = event;
+
+      switch (key) {
+        case 'Enter':
+        case 'ArrowRight':
+          handleContinue();
+          break;
+
+        case 'ArrowLeft':
+          // You can change this to go back or say something
+          speak("You are on the first screen. Please press Enter to continue.");
+          break;
+
+        case 'r':
+        case 'R':
+          speak(welcomeText);
+          break;
+
+        case '1':
+        case '2':
+        case '3':
+          // Optional: Navigate directly to a slide
+          const slideNum = parseInt(key, 10);
+          navigate(`/course/spoken-english?slide=${slideNum}`);
+          break;
+
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isRegistered, navigate, speak]);
+
 
   const handleContinue = () => {
     if (isRegistered) {

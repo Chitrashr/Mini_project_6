@@ -7,26 +7,40 @@ interface NavigationControlsProps {
   currentSlide: number;
   totalSlides: number;
   courseId: string;
+  moduleId?: string;
+  onNavigate?: (slideNumber: number) => void;
 }
 
 const NavigationControls: React.FC<NavigationControlsProps> = ({
   currentSlide,
   totalSlides,
-  courseId
+  courseId,
+  moduleId = 'module-1',
+  onNavigate
 }) => {
   const navigate = useNavigate();
 
   const goToPreviousSlide = () => {
-    if (currentSlide > 1) {
-      navigate(`/course/${courseId}?slide=${currentSlide - 1}`);
+    const prevSlide = currentSlide - 1;
+    if (prevSlide >= 1) {
+      if (onNavigate) {
+        onNavigate(prevSlide);
+      } else {
+        navigate(`/course/${courseId}?module=${moduleId}&slide=${prevSlide}`);
+      }
     }
   };
 
   const goToNextSlide = () => {
-    if (currentSlide < totalSlides) {
-      navigate(`/course/${courseId}?slide=${currentSlide + 1}`);
+    const nextSlide = currentSlide + 1;
+    if (nextSlide <= totalSlides) {
+      if (onNavigate) {
+        onNavigate(nextSlide);
+      } else {
+        navigate(`/course/${courseId}?module=${moduleId}&slide=${nextSlide}`);
+      }
     } else {
-      navigate(`/quiz/${courseId}`);
+      navigate(`/quiz/${courseId}?module=${moduleId}`);
     }
   };
 
@@ -36,7 +50,7 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
         onClick={goToPreviousSlide}
         ariaLabel="Go to previous slide"
         disabled={currentSlide === 1}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 disabled:opacity-50"
       >
         <ChevronLeft size={20} />
         <span>Previous</span>

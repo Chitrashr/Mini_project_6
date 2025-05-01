@@ -11,7 +11,8 @@ export interface Course {
   id: string;
   name: string;
   description: string;
-  slides: Slide[];
+  slides: Slide[]; 
+
 }
 
 export interface QuizQuestion {
@@ -30,6 +31,7 @@ interface CourseContextType {
   courses: Course[];
   getCourse: (courseId: string) => Course | undefined;
   getQuiz: (courseId: string) => Quiz | undefined;
+  
 }
 
 const CourseContext = createContext<CourseContextType | undefined>(undefined);
@@ -44,6 +46,7 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const getQuiz = (courseId: string) => {
     return mockQuizzes.find(quiz => quiz.courseId === courseId);
   };
+
 
   return (
     <CourseContext.Provider value={{ courses, getCourse, getQuiz }}>

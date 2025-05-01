@@ -1,78 +1,79 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSpeech } from '../contexts/SpeechContext';
 import { useCourse } from '../contexts/CourseContext';
 import { useUser } from '../contexts/UserContext';
+import { useSpeech } from '../contexts/SpeechContext';
 import AccessibleButton from '../components/AccessibleButton';
 import { BookOpen, Check } from 'lucide-react';
 
 const CourseSelection: React.FC = () => {
-  const { speak } = useSpeech();
   const { courses } = useCourse();
   const { user } = useUser();
+  const { speak } = useSpeech();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const instructionText = `Course Selection Page. We offer ${courses.length} courses. Use tab to navigate between course options and press Enter to select a course.`;
-    speak(instructionText);
-  }, [speak, courses.length]);
+    if (!user) {
+      navigate('/register');
+    } else {
+      const instructions = `Welcome ${user.name}. You are on the Course Selection page. We offer ${courses.length} courses. Use Tab to explore, and Enter to select.`;
+      speak(instructions);
+    }
+  }, [courses.length, navigate, speak, user]);
 
-  const handleCourseSelect = (courseId: string) => {
-    speak(`You selected ${courses.find(c => c.id === courseId)?.name}. Loading course content.`);
+  const handleSelect = (courseId: string) => {
+    const selected = courses.find(c => c.id === courseId);
+    speak(`You selected ${selected?.name}. Starting course now.`);
     navigate(`/course/${courseId}?slide=1`);
   };
-
-  if (!user) {
-    navigate('/register');
-    return null;
-  }
 
   return (
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <header className="text-center mb-12">
-          <h1 className="text-3xl font-bold mb-2 text-white">Course Selection</h1>
-          <p className="text-xl text-gray-300">
-            Welcome, {user.name}. Please select a course to begin.
-          </p>
+          <h1 className="text-3xl font-bold text-white mb-2">Course Selection</h1>
+          {user && (
+            <p className="text-xl text-gray-300">Hello {user.name}, please select a course to begin learning.</p>
+          )}
         </header>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {courses.map((course) => {
-            const isCompleted = user.completedCourses.includes(course.id);
-            
+          {courses.map(course => {
+            const isCompleted = user?.completedCourses.includes(course.id) ?? false;
+
             return (
-              <div 
+              <div
                 key={course.id}
-                className="bg-gray-900 rounded-lg overflow-hidden transition-transform hover:transform hover:scale-[1.02]"
+                className="bg-gray-900 rounded-lg overflow-hidden shadow-md transition-transform hover:scale-[1.02]"
               >
                 <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="p-3 bg-purple-800/20 rounded-full">
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="p-3 bg-purple-700/20 rounded-full">
                       <BookOpen className="text-purple-400" size={24} />
                     </div>
                     {isCompleted && (
-                      <div className="bg-green-800/20 p-2 rounded-full">
+                      <div className="bg-green-700/20 p-2 rounded-full">
                         <Check className="text-green-400" size={16} />
                       </div>
                     )}
                   </div>
-                  
-                  <h2 className="text-xl font-bold mb-2 text-white">{course.name}</h2>
-                  <p className="text-gray-400 mb-6">{course.description}</p>
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-6">
+
+                  <h2 className="text-xl font-semibold text-white mb-2">{course.name}</h2>
+                  <p className="text-gray-400 mb-4">{course.description}</p>
+
+                  <div className="text-sm text-gray-500 mb-6 flex justify-between">
                     <span>{course.slides.length} slides</span>
                     <span>{isCompleted ? 'Completed' : 'Not completed'}</span>
                   </div>
-                  
+
                   <AccessibleButton
-                    onClick={() => handleCourseSelect(course.id)}
-                    ariaLabel={`Start ${course.name} course`}
-                    className="w-full justify-center"
-                  >
-                    {isCompleted ? 'Review Course' : 'Start Course'}
-                  </AccessibleButton>
+  onClick={() => handleSelect(course.id)}
+  className="w-full justify-center"
+  ariaLabel={`${course.name} - Start Course`}
+>
+  {isCompleted ? 'Review Course' : 'Start Course'}
+</AccessibleButton>
+
                 </div>
               </div>
             );
