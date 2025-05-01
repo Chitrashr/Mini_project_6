@@ -12,8 +12,7 @@ const Welcome: React.FC = () => {
 
   const welcomeText = `Welcome to Vision Skills, a vocational training platform designed for visually impaired individuals. 
   This application features full keyboard navigation and voice synthesis. 
-  Use the arrow keys to navigate between slides. Press numbers 1 through 3 to jump to specific slides. 
-  Press R to repeat the current audio. To get started, please register or continue to courses if you're already registered.`;
+  Use the arrow keys to navigate between slides. Press numbers 1 through 3 to jump to specific slides. Press Shift to navigate between the buttons. Press R to repeat the current audio. To get started, please register or continue to courses if you're already registered.`;
 
   useEffect(() => {
     // Automatically read welcome text when component mounts
@@ -104,6 +103,10 @@ const Welcome: React.FC = () => {
           <li className="flex items-start">
             <span className="inline-block bg-gray-800 rounded-md px-2 py-1 mr-2 text-purple-400">1-3</span>
             <span>Press number keys to jump to specific slides</span>
+          </li>
+          <li className="flex items-start">
+            <span className="inline-block bg-gray-800 rounded-md px-2 py-1 mr-2 text-purple-400">Shift</span>
+            <span>Press Shift to navigate between the buttons</span>
           </li>
           <li className="flex items-start">
             <span className="inline-block bg-gray-800 rounded-md px-2 py-1 mr-2 text-purple-400">R</span>

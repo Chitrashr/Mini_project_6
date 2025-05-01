@@ -1,6 +1,6 @@
 
 //implemented R on every slide
-import {useEffect, ReactNode } from 'react';
+import { useRef, useEffect, ReactNode } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useSpeech } from '../contexts/SpeechContext';
 import { useCourse } from '../contexts/CourseContext';
@@ -18,6 +18,8 @@ const KeyboardHandler: React.FC<KeyboardHandlerProps> = ({ children }) => {
   const { getCourse } = useCourse();
 
   const params = useParams();
+  const isPausedRef = useRef(false);
+
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -33,24 +35,22 @@ const KeyboardHandler: React.FC<KeyboardHandlerProps> = ({ children }) => {
       }
 
       // Add this block for pause/resume
-
-      // if (event.key === 'p') {
-      //   if (!isSupported) return;
-      
-      //   if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-      //     window.speechSynthesis.pause();
-      //     setTimeout(() => speak("Paused"), 200);
-      //     return;
-      //   } else if (window.speechSynthesis.paused) {
-      //     window.speechSynthesis.resume();
-      //     setTimeout(() => speak("Resumed"), 200);
-      //     return;
-      //   }
-      // }
         
+      if (event.key === 'p') {
+        if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+          window.speechSynthesis.pause();
+          isPausedRef.current = true;
+          
+          return;
+        } else if (window.speechSynthesis.paused && isPausedRef.current) {
+          window.speechSynthesis.resume();
+          
+          isPausedRef.current = false;
+          return;
+        }
+      }
+          
       
-
-
       // Handle Shift key to move focus between buttons or inputs
       if (event.key === 'Shift') {
         event.preventDefault();
