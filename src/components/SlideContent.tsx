@@ -12,16 +12,23 @@ const SlideContent: React.FC<SlideContentProps> = ({ slide, autoRead = true }) =
 
   useEffect(() => {
     if (autoRead) {
-      // First read the title, then the content
       const textToRead = `${slide.title}. ${slide.content}`;
-      speak(textToRead);
+
+      // Delay before reading to avoid clipping the start
+      const timeoutId = setTimeout(() => {
+        speak(textToRead);
+      }, 300); // 300ms delay
+
+      return () => clearTimeout(timeoutId); // Cleanup on unmount
     }
   }, [slide, speak, autoRead]);
 
   return (
     <div className="bg-gray-900 rounded-lg p-8 shadow-lg max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-white">{slide.title}</h1>
-      <div className="text-lg text-gray-300 leading-relaxed">
+
+      {/* Scrollable content container */}
+      <div className="text-lg text-gray-300 leading-relaxed max-h-[400px] overflow-y-auto pr-2">
         {slide.content.split('\n').map((paragraph, index) => (
           <p key={index} className="mb-4">{paragraph}</p>
         ))}

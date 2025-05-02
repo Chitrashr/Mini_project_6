@@ -33,17 +33,22 @@ const CourseSelection: React.FC = () => {
         <header className="text-center mb-12">
           <h1 className="text-3xl font-bold text-white mb-2">Course Selection</h1>
           {user && (
-            <p className="text-xl text-gray-300">Hello {user.name}, please select a course to begin learning.</p>
+            <p className="text-xl text-gray-300">
+              Hello {user.name}, please select a course to begin learning.
+            </p>
           )}
         </header>
 
         <div className="grid md:grid-cols-2 gap-6">
           {courses.map(course => {
             const isCompleted = user?.completedCourses.includes(course.id) ?? false;
+            const ariaDescription = `${course.name}. ${course.description}. This course has ${course.slides.length} slides. ${isCompleted ? 'You have completed this course.' : 'You have not completed this course yet.'}`;
 
             return (
               <div
                 key={course.id}
+                role="region"
+                aria-label={ariaDescription}
                 className="bg-gray-900 rounded-lg overflow-hidden shadow-md transition-transform hover:scale-[1.02]"
               >
                 <div className="p-6">
@@ -67,13 +72,12 @@ const CourseSelection: React.FC = () => {
                   </div>
 
                   <AccessibleButton
-  onClick={() => handleSelect(course.id)}
-  className="w-full justify-center"
-  ariaLabel={`${course.name} - Start Course`}
->
-  {isCompleted ? 'Review Course' : 'Start Course'}
-</AccessibleButton>
-
+                    onClick={() => handleSelect(course.id)}
+                    className="w-full justify-center"
+                    ariaLabel={`${course.name}. ${course.description}. ${isCompleted ? 'Review course' : 'Start course'}`}
+                  >
+                    {isCompleted ? 'Review Course' : 'Start Course'}
+                  </AccessibleButton>
                 </div>
               </div>
             );

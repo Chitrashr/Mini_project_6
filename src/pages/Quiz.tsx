@@ -432,7 +432,9 @@ import { useCourse } from '../contexts/CourseContext';
 import { useUser } from '../contexts/UserContext';
 import AccessibleButton from '../components/AccessibleButton';
 import { CheckCircle, XCircle } from 'lucide-react';
-import { speakText } from '../utils/speakText'; // new import
+import { speakText } from '../utils/speakText';
+
+const PASSING_SCORE = 13;
 
 const Quiz: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -465,12 +467,10 @@ const Quiz: React.FC = () => {
     }
   }, [quiz, course, question, currentQuestion, speak, navigate, quizCompleted]);
 
-  // Handle option selection by key press
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const { key } = event;
 
-      // Handle 1, 2, 3, 4 for selecting options
       if (key >= '1' && key <= '4') {
         const optionIndex = parseInt(key, 10) - 1;
         setSelectedOption(optionIndex);
@@ -489,7 +489,6 @@ const Quiz: React.FC = () => {
         }
       }
 
-      // Handle Enter to go to next question
       if (key === 'Enter' && selectedOption !== null) {
         handleNextQuestion();
       }
@@ -531,7 +530,14 @@ const Quiz: React.FC = () => {
       const totalQuestions = quiz?.questions.length || 0;
       const finalScore = score + (isCorrect ? 1 : 0);
       const percentage = Math.round((finalScore / totalQuestions) * 100);
-      speak(`Quiz completed! Your score is ${finalScore} out of ${totalQuestions}, which is ${percentage}%. You can now view your certificate.`);
+
+      if (finalScore >= PASSING_SCORE) {
+        speak(`Quiz completed! Your score is ${finalScore} out of ${totalQuestions}, which is ${percentage}%. You passed the quiz and can now view your certificate.`);
+      } else {
+        speak(`Quiz completed! Your score is ${finalScore} out of ${totalQuestions}, which is ${percentage}%. You did not pass. Please retake the quiz to earn your certificate.`);
+      }
+
+      setScore(finalScore);
     }
   };
 
@@ -543,10 +549,10 @@ const Quiz: React.FC = () => {
         {!quizCompleted ? (
           <>
             <header className="text-center mb-8">
-              <h1 className="text-2xl font-bold mb-2 text-white">
-                Call Center Communication - Quiz
+              <h1 className="text-3xl font-extrabold text-white inline-block border-b-4 border-purple-500 pb-2">
+                {course?.name} - Quiz
               </h1>
-              <p className="text-gray-400">
+              <p className="text-gray-400 mt-2">
                 Question {currentQuestion + 1} of {quiz.questions.length}
               </p>
             </header>
@@ -625,24 +631,36 @@ const Quiz: React.FC = () => {
             <p className="text-gray-400 mb-8">
               {score === quiz.questions.length
                 ? "Perfect score! Excellent work!"
-                : score >= Math.ceil(quiz.questions.length / 2)
+                : score >= PASSING_SCORE
                 ? "Good job! You've passed the quiz."
-                : "Keep practicing. You can retake the quiz to improve your score."}
+                : "You did not pass. Please try again to earn your certificate."}
             </p>
             <div className="flex flex-col md:flex-row gap-4 justify-center">
-              <AccessibleButton
-                onClick={() => navigate(`/certificate/${courseId}`)}
-                ariaLabel="View your certificate"
-              >
-                View Certificate
-              </AccessibleButton>
-              <AccessibleButton
-                onClick={() => navigate('/courses')}
-                ariaLabel="Return to course selection"
-                className="bg-gray-800 hover:bg-gray-700"
-              >
-                Back to Courses
-              </AccessibleButton>
+              {score >= PASSING_SCORE ? (
+                <>
+                  <AccessibleButton
+                    onClick={() => navigate(`/certificate/${courseId}`)}
+                    ariaLabel="View your certificate"
+                  >
+                    View Certificate
+                  </AccessibleButton>
+                  <AccessibleButton
+                    onClick={() => navigate('/courses')}
+                    ariaLabel="Return to course selection"
+                    className="bg-gray-800 hover:bg-gray-700"
+                  >
+                    Back to Courses
+                  </AccessibleButton>
+                </>
+              ) : (
+                <AccessibleButton
+                  onClick={() => window.location.reload()}
+                  ariaLabel="Retake the quiz"
+                  className="bg-red-700 hover:bg-red-600"
+                >
+                  Retake Quiz
+                </AccessibleButton>
+              )}
             </div>
           </div>
         )}

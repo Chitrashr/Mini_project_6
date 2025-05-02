@@ -105,7 +105,13 @@ const CourseViewer: React.FC = () => {
           <span>Courses</span>
         </AccessibleButton>
       </header>
-
+       {/* Progress Bar */}
+      <div className="h-2 rounded-full bg-gray-700 mb-6 max-w-4xl mx-auto">
+        <div
+          className="h-2 rounded-full bg-purple-500 transition-all duration-300"
+          style={{ width: `${((currentIndex + 1) / totalSlides) * 100}%` }}
+        />
+      </div>
       {/* Hidden live region for screen readers */}
       <div aria-live="polite" className="sr-only">
         {slide.title} - {slide.content}

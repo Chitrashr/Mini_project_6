@@ -46,23 +46,24 @@ export const SpeechProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   const speak = useCallback((text: string, rate = 1, pitch = 1) => {
     if (!isSupported) return;
-
+  
     // Cancel any ongoing speech
     speechSynthesis.cancel();
-
-    // Create a new utterance
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = rate;
-    utterance.pitch = pitch;
-
+  
     // Store the last utterance details for replay
     setLastText(text);
     setLastRate(rate);
     setLastPitch(pitch);
-
-    // Speak the utterance
-    speechSynthesis.speak(utterance);
+  
+    // Delay to allow cancel() to settle before speaking
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = rate;
+      utterance.pitch = pitch;
+      speechSynthesis.speak(utterance);
+    }, 300); // Delay increased to 300ms
   }, [isSupported]);
+  
 
   const stop = useCallback(() => {
     if (!isSupported) return;
