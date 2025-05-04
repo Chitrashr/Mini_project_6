@@ -5,7 +5,8 @@ import { useUser } from '../contexts/UserContext';
 import { useCourse } from '../contexts/CourseContext';
 import AccessibleButton from '../components/AccessibleButton';
 import { Download, Home } from 'lucide-react';
-
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const Certificate: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -39,10 +40,36 @@ const Certificate: React.FC = () => {
     speak(`Certificate for ${course.name}. Congratulations ${user.name} on completing the ${course.name} course. This certificate is presented on ${new Date().toLocaleDateString()}.`);
   }, [user, course, courseId, navigate, speak]);
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
+    if (!user || !certificateRef.current) return;
+
     speak("Generating certificate PDF. This might take a moment.");
-    // In a real implementation, this would generate and download a PDF
-    speak("Certificate downloaded successfully.");
+
+    try {
+      const input = certificateRef.current;
+
+      const canvas = await html2canvas(input, {
+        scale: 2, // sharp quality
+        useCORS: true,
+        scrollY: -window.scrollY, // fix clipped parts
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('landscape', 'pt', 'a4');
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${user.name}_Certificate.pdf`);
+      
+
+
+      speak("Certificate downloaded successfully.");
+    } catch (error) {
+      console.error("PDF generation failed", error);
+      speak("There was an error generating the certificate.");
+    }    
   };
 
   if (!user || !course) return null;
@@ -56,7 +83,7 @@ const Certificate: React.FC = () => {
   return (
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <div 
+        <div
           ref={certificateRef}
           className="bg-gray-900 rounded-lg p-8 border-4 border-purple-600 shadow-lg mb-8 relative overflow-hidden"
         >
@@ -64,39 +91,41 @@ const Certificate: React.FC = () => {
           <div className="absolute inset-0 opacity-5">
             <div className="absolute inset-0 bg-pattern"></div>
           </div>
-          
+
           {/* Certificate seal */}
           <div className="absolute top-8 right-8 w-24 h-24 rounded-full border-2 border-purple-400 flex items-center justify-center bg-purple-900/20">
             <span className="text-purple-400 text-xs text-center font-mono">VISION SKILLS CERTIFIED</span>
           </div>
 
-          <div className="relative text-center py-8">
-            <h1 className="text-3xl font-bold text-white mb-2">Certificate of Completion</h1>
-            <p className="text-gray-400 mb-8">This certificate is awarded to</p>
-            
-            <h2 className="text-4xl font-bold text-purple-400 mb-6 font-serif">{user.name}</h2>
-            
+          <div className="relative text-center py-3">
+            <h1 className="text-3xl font-bold text-white mb-3">Certificate of Completion</h1>
+            <p className="text-gray-400 mb-5">This certificate is awarded to</p>
+
+            <h2 className="text-4xl font-bold text-purple-400 mb-4 font-serif">{user.name}</h2>
+
             <p className="text-gray-300 mb-6">
               for successfully completing the course
             </p>
-            
-            <h3 className="text-2xl font-bold text-white mb-8 font-serif">{course.name}</h3>
-            
-            <p className="text-gray-400 mb-12">
+
+            <h3 className="text-2xl font-bold text-white mb-4 font-serif">{course.name}</h3>
+
+            <p className="text-gray-400 mt-6 mb-12">
               Demonstrating proficiency in the skills and knowledge required.
             </p>
-            
+
             <div className="flex justify-between items-center max-w-lg mx-auto">
               <div>
                 <div className="w-32 border-b border-gray-500 mb-2"></div>
-                <p className="text-sm text-gray-500">Date: {today}</p>
+                <p className="text-sm text-white font-bold">Date: {today}</p>
               </div>
-              
+
               <div>
                 <div className="w-32 border-b border-gray-500 mb-2"></div>
-                <p className="text-sm text-gray-500">VisionSkills Director</p>
+                <p className="text-sm text-white font-bold">VisionSkills Director</p>
               </div>
             </div>
+
+
           </div>
         </div>
 
@@ -109,7 +138,7 @@ const Certificate: React.FC = () => {
             <Download size={18} />
             <span>Download Certificate</span>
           </AccessibleButton>
-          
+
           <AccessibleButton
             onClick={() => navigate('/courses')}
             ariaLabel="Return to course selection"

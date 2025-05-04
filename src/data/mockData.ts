@@ -226,7 +226,7 @@ export const mockCourses: Course[] = [
         title: ' Lesson 3.3: Closing the Call Professionally ',
         content: `
       
-      SUMMARIZIN THE OUTCOMES: Before saying goodbye, quickly recap what was achieved during the call and what the customer (or you) needs to do next. This ensures everyone is on the same page.
+      SUMMARIZING THE OUTCOMES: Before saying goodbye, quickly recap what was achieved during the call and what the customer (or you) needs to do next. This ensures everyone is on the same page.
          "Summary" Examples:
           1) "So, just to confirm, your new password has been set, and you should be able to log in now. Is that correct?"
           2) "We've scheduled a technician to visit your home tomorrow between 9 am and 12 pm."
