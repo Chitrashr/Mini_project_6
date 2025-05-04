@@ -10,7 +10,7 @@ export const mockCourses: Course[] = [
         id: 1,
         title: 'Module 1 - Lesson 1.1: Understanding the Call Center Environment',
         content: `
-        INTODUCTION TO CALL CENTERS:
+        INTRODUCTION TO CALL CENTERS:
       
       A call center is a place where trained people, called call center agents, talk to customers over the phone. Customers call for different reasons — they might have questions about a product, need help with a service, or want to make a complaint. A call center agent listens carefully and gives the right information or solution. The main goal of a call center is to provide help quickly and politely so that the customer feels happy and satisfied after the call.
       
@@ -41,7 +41,7 @@ export const mockCourses: Course[] = [
       {
         
           id: 2,
-          title: 'Lesson 1.2:Roles and Responsibilities of a Call Center Agent',
+          title: 'Lesson 1.2: Roles and Responsibilities of a Call Center Agent',
           content: `
         
         WHO IS A CALL CENTER AGENT?:

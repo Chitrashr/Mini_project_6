@@ -6,6 +6,7 @@ import { useCourse } from '../contexts/CourseContext';
 import AccessibleButton from '../components/AccessibleButton';
 import { Download, Home } from 'lucide-react';
 
+
 const Certificate: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const { speak } = useSpeech();

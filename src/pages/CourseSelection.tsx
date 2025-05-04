@@ -16,7 +16,7 @@ const CourseSelection: React.FC = () => {
     if (!user) {
       navigate('/register');
     } else {
-      const instructions = `Welcome ${user.name}. You are on the Course Selection page. We offer ${courses.length} courses. Use Tab to explore, and Enter to select.`;
+      const instructions = `Welcome ${user.name}. You are on the Course Selection page. We offer ${courses.length} courses. Use Shift to explore, and Enter to select.`;
       speak(instructions);
     }
   }, [courses.length, navigate, speak, user]);
