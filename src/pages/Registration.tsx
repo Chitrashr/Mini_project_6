@@ -18,7 +18,8 @@ const Registration: React.FC = () => {
   });
 
   useEffect(() => {
-    const instructionText = "Please fill out the registration form. Use tab key to navigate between form fields. All fields are required.";
+    const instructionText =
+      "Please fill out the registration form. Use tab key to navigate between form fields. All fields are required.";
     speak(instructionText);
   }, [speak]);
 
@@ -30,16 +31,25 @@ const Registration: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    setUser({
+    const newUser = {
       name: formData.name,
+      phone: formData.phone,
       age: parseInt(formData.age, 10),
       education: formData.education,
-      completedCourses: []
-    });
+      completedCourses: [],
+      progress: {}
+    };
+
+    // Save to localStorage
+    const storedUsers = JSON.parse(localStorage.getItem('usersData') || '[]');
+    storedUsers.push(newUser);
+    localStorage.setItem('usersData', JSON.stringify(storedUsers));
+
+    // Set as current user in context
+    setUser(newUser);
 
     speak("Registration successful. You will now be redirected to the course selection page.");
 
-    // Delay navigation to allow speech to finish
     setTimeout(() => {
       navigate('/courses');
     }, 2000);
@@ -48,7 +58,7 @@ const Registration: React.FC = () => {
   const educationOptions = [
     { value: 'high-school', label: 'High School' },
     { value: 'associate', label: 'Associate Degree' },
-    { value: 'bachelor', label: 'Bachelor\'s Degree' },
+    { value: 'bachelor', label: "Bachelor's Degree" },
     { value: 'master', label: 'Master\'s Degree' },
     { value: 'doctorate', label: 'Doctorate' },
     { value: 'other', label: 'Other' }
@@ -69,7 +79,7 @@ const Registration: React.FC = () => {
             required
             value={formData.name}
             onChange={handleChange}
-            onFocus={() => speak("Please enter your full name.")}//new
+            onFocus={() => speak("Please enter your full name.")}
             placeholder="Enter your full name"
           />
 
@@ -80,7 +90,7 @@ const Registration: React.FC = () => {
             required
             value={formData.age}
             onChange={handleChange}
-            onFocus={() => speak("Please enter your age.")}//new
+            onFocus={() => speak("Please enter your age.")}
             min={18}
             max={100}
             placeholder="Enter your age"
@@ -89,28 +99,13 @@ const Registration: React.FC = () => {
           <FormField
             id="phone"
             label="Phone No."
-            type="string"
+            type="text"
             required
             value={formData.phone}
             onChange={handleChange}
-            onFocus={() => speak("Please enter your phone number.")}//new
-            min={18}
-            max={100}
+            onFocus={() => speak("Please enter your phone number.")}
             placeholder="Enter your Phone No."
           />
-
-          {/* <FormField
-            id="education"
-            label="Education Level"
-            type="select"
-            required
-            value={formData.education}
-            onChange={handleChange}
-            onFocus={() => speak("Please select your education level.")}//new
-            
-            options={educationOptions}
-            
-          /> */}
 
           <FormField
             id="education"
@@ -121,7 +116,7 @@ const Registration: React.FC = () => {
             onChange={handleChange}
             onFocus={() => speak("Please select your education level.")}
             options={[
-              { value: '', label: 'Select your education level', disabled: true }, // <-- Placeholder option
+              { value: '', label: 'Select your education level', disabled: true },
               ...educationOptions.map(option => ({
                 ...option,
                 disabled: false
@@ -129,10 +124,9 @@ const Registration: React.FC = () => {
             ]}
           />
 
-
           <div className="mt-8">
             <AccessibleButton
-              onClick={() => { }}
+              type="submit"
               ariaLabel="Submit registration form"
               className="w-full text-lg"
             >

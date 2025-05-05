@@ -12,6 +12,7 @@ import Quiz from './pages/Quiz';
 import Certificate from './pages/Certificate';
 import NotFound from './pages/NotFound';
 import KeyboardHandler from './components/KeyboardHandler';
+import LoginPage from './pages/Login';
 
 function App() {
   useEffect(() => {
@@ -28,12 +29,13 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Welcome />} />
                   <Route path="/register" element={<Registration />} />
+                  <Route path="/login" element={<LoginPage />} /> {/* Moved up here */}
                   <Route path="/courses" element={<CourseSelection />} />
                   <Route path="/course/:courseId" element={<CourseViewer />} />
                   <Route path="/quiz/:courseId" element={<Quiz />} />
                   <Route path="/certificate/:courseId" element={<Certificate />} />
                   <Route path="/404" element={<NotFound />} />
-                  <Route path="*" element={<Navigate to="/404" replace />} />
+                  <Route path="*" element={<Navigate to="/404" replace />} /> {/* Catch-all LAST */}
                 </Routes>
               </KeyboardHandler>
             </div>

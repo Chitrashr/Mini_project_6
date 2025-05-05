@@ -1,23 +1,21 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSpeech } from '../contexts/SpeechContext';
-import { useUser } from '../contexts/UserContext';
 import AccessibleButton from '../components/AccessibleButton';
 import { Headphones } from 'lucide-react';
 
 const Welcome: React.FC = () => {
   const { speak } = useSpeech();
-  const { isRegistered } = useUser();
   const navigate = useNavigate();
 
   const welcomeText = `Welcome to Vision Skills, a vocational training platform designed for visually impaired individuals. 
   This application features full keyboard navigation and voice synthesis. 
-  Use the arrow keys to navigate between slides. Press numbers 1 through 3 to jump to specific slides. Press Shift to navigate between the buttons. Press P to pause and resume. Press R to repeat the current audio. To get started, please register or continue to courses if you're already registered.`;
+  Use the arrow keys to navigate between slides. Press numbers 1 through 3 to jump to specific slides. Press Shift to navigate between the buttons. Press P to pause and resume. Press R to repeat the current audio. To get started, please register or login.`;
 
   useEffect(() => {
-    // Automatically read welcome text when component mounts
     speak(welcomeText);
   }, [speak]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
@@ -34,16 +32,6 @@ const Welcome: React.FC = () => {
       const { key } = event;
 
       switch (key) {
-        case 'Enter':
-        case 'ArrowRight':
-          handleContinue();
-          break;
-
-        case 'ArrowLeft':
-          // You can change this to go back or say something
-          speak("You are on the first screen. Please press Enter to continue.");
-          break;
-
         case 'r':
         case 'R':
           speak(welcomeText);
@@ -52,7 +40,6 @@ const Welcome: React.FC = () => {
         case '1':
         case '2':
         case '3':
-          // Optional: Navigate directly to a slide
           const slideNum = parseInt(key, 10);
           navigate(`/course/spoken-english?slide=${slideNum}`);
           break;
@@ -66,16 +53,7 @@ const Welcome: React.FC = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isRegistered, navigate, speak]);
-
-
-  const handleContinue = () => {
-    if (isRegistered) {
-      navigate('/courses');
-    } else {
-      navigate('/register');
-    }
-  };
+  }, [navigate, speak]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-b from-gray-950 to-gray-900">
@@ -101,7 +79,7 @@ const Welcome: React.FC = () => {
             <span>Use left arrow key to go back to the previous slide</span>
           </li>
           <li className="flex items-start">
-            <span className="inline-block bg-gray-800 rounded-md px-2 py-1 mr-2 text-purple-400">1-3</span>
+            <span className="inline-block bg-gray-800 rounded-md px-2 py-1 mr-2 text-purple-400">1-9</span>
             <span>Press number keys to jump to specific slides</span>
           </li>
           <li className="flex items-start">
@@ -119,13 +97,22 @@ const Welcome: React.FC = () => {
         </ul>
       </div>
 
-      <AccessibleButton
-        onClick={handleContinue}
-        ariaLabel={isRegistered ? "Continue to courses" : "Register to get started"}
-        className="text-lg px-8 py-4"
-      >
-        {isRegistered ? "Continue to Courses" : "Register to Get Started"}
-      </AccessibleButton>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <AccessibleButton
+          onClick={() => navigate('/register')}
+          ariaLabel="Register to get started"
+          className="text-lg px-8 py-4"
+        >
+          Register
+        </AccessibleButton>
+        <AccessibleButton
+          onClick={() => navigate('/login')}
+          ariaLabel="Login to continue learning"
+          className="text-lg px-8 py-4"
+        >
+          Login
+        </AccessibleButton>
+      </div>
     </div>
   );
 };
